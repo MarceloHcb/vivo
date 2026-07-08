@@ -76,8 +76,7 @@ export default function Jogo() {
   // e dispara um único setJogo (evita o aviso de cascata).
   useEffect(() => {
     localStorage.setItem("pontosJogo", "0");
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- necessário: embaralhar só pode rodar no cliente, pra evitar hydration mismatch
-  setJogo({
+    setJogo({
       perguntas: embaralhar(PERGUNTAS_BASE),
       pontos: 0,
     });
@@ -128,7 +127,7 @@ export default function Jogo() {
     return (
       <TelaFinal
         titulo="Parabéns! 🎉"
-        mensagem="Você acertou todo mundo e ganhou 6 meses de Amazon Prime ligue para 10315!"
+        mensagem="Você acertou todo mundo e ganhou 6 meses de Amazon Prime!"
         mostrarBotao={false}
       />
     );
