@@ -1,0 +1,214 @@
+"use client";
+
+import { useState, useEffect } from "react";
+
+// 👉 Troque os nomes e fotos das 7 pessoas aqui
+const PESSOAS = [
+  { id: 1, nome: "Josafifa", foto: "/pessoas/Josafifa.jpg" },
+  { id: 2, nome: "Aline", foto: "/pessoas/Aline.jpg" },
+  { id: 3, nome: "Maria", foto: "/pessoas/Maria.jpg" },
+  { id: 4, nome: "Diogo", foto: "/pessoas/Diogo.jpg" },
+  { id: 5, nome: "Djavan", foto: "/pessoas/Djavan.jpg" },
+  { id: 6, nome: "Luiz", foto: "/pessoas/Luiz.jpg" },
+  { id: 7, nome: "Marcelo", foto: "/pessoas/Marcelo.jpg" },
+  { id: 8, nome: "Marcella", foto: "/pessoas/Marcella.jpg" }
+];
+
+// 👉 Troque os textos das perguntas aqui (cada uma aponta pro id da pessoa certa)
+const PERGUNTAS_BASE = [
+  { id: 1, texto: "Olá, olá.. Bom dia, já tem internet boa ai na residência?", respostaId: 1 },
+  { id: 2, texto: "OLÁ BOM DIA!!! OLÁ BOM DIA!!! Bom dia minha querida", respostaId: 2 },
+  { id: 3, texto: "Olá bom dia! primeiramente poderia me arrumar um copinho d'água?", respostaId: 3 },
+  { id: 4, texto: "Oi Meninaaaa, vamos colocar uma internet boa ai na casa? olha que cachorrinha bonitinha, eu tenho uma Pinscher", respostaId: 4 },
+  { id: 5, texto: "Bom dia tem interesse em conhecer nossos planos de internet e telefonia movel? sou cria do Dendê", respostaId: 5 },
+  { id: 6, texto: "Olá minha amiga desculpe atrapalhar o seu dia, é a vivo que esta passando aqui na sua rua, foi liberada uma oferta... ", respostaId: 6 },
+  { id: 7, texto: "O de casa Bom dia! um instante Sra. vou ali comprar uma Halls e já volto, oi já voltei!", respostaId: 7 },
+  { id: 8, texto: "OLÁ OLÁ MINHA AMIGA... VAMO COLOCAR INTERNET LA NA SUA CASA", respostaId: 8 }
+];
+
+function embaralhar(array:any[]) {
+  const copia = [...array];
+  for (let i = copia.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copia[i], copia[j]] = [copia[j], copia[i]];
+  }
+  return copia;
+}
+
+const PONTOS_POR_ACERTO = 10;
+const PONTUACAO_MAXIMA = PESSOAS.length * PONTOS_POR_ACERTO;
+
+export default function Jogo() {
+  const [perguntas, setPerguntas] = useState(() => embaralhar(PERGUNTAS_BASE));
+  const [indiceAtual, setIndiceAtual] = useState(0);
+  const [pontos, setPontos] = useState(0);
+  const [acertou, setAcertou] = useState(false);
+  const [erro, setErro] = useState(false);
+  const [fase, setFase] = useState("jogando"); // jogando | venceu | perdeu
+
+  // Zera a pontuação sempre que entra nessa tela
+  useEffect(() => {
+    localStorage.setItem("pontosJogo", "0");
+    setPontos(0);
+  }, []);
+
+  const perguntaAtual = perguntas[indiceAtual];
+  const pessoaCorreta = PESSOAS.find((p) => p.id === perguntaAtual?.respostaId);
+
+  function handleSelecionar(pessoaId) {
+    if (acertou) return;
+
+    if (pessoaId === perguntaAtual.respostaId) {
+      const novoTotal = pontos + PONTOS_POR_ACERTO;
+      setPontos(novoTotal);
+      localStorage.setItem("pontosJogo", String(novoTotal));
+      setAcertou(true);
+      setErro(false);
+    } else {
+      setErro(true);
+      setTimeout(() => setErro(false), 900);
+    }
+  }
+
+  function proximaPergunta() {
+    const proximoIndice = indiceAtual + 1;
+
+    if (proximoIndice < perguntas.length) {
+      setIndiceAtual(proximoIndice);
+      setAcertou(false);
+    } else {
+      setFase(pontos === PONTUACAO_MAXIMA ? "venceu" : "perdeu");
+    }
+  }
+
+  function tentarNovamente() {
+    setPerguntas(embaralhar(PERGUNTAS_BASE));
+    setIndiceAtual(0);
+    setPontos(0);
+    setAcertou(false);
+    setErro(false);
+    setFase("jogando");
+    localStorage.setItem("pontosJogo", "0");
+  }
+
+  if (fase === "venceu") {
+    return (
+      <TelaFinal
+        titulo="Parabéns! 🎉"
+        mensagem="Você acertou todo mundo e ganhou 6 meses de Amazon Prime!"
+        mostrarBotao={false}
+      />
+    );
+  }
+
+  if (fase === "perdeu") {
+    return (
+      <TelaFinal
+        titulo="Que pena!"
+        mensagem="Infelizmente você não atingiu a pontuação máxima. Tente novamente!"
+        mostrarBotao={true}
+        onTentarNovamente={tentarNovamente}
+      />
+    );
+  }
+
+  return (
+    <main className="relative flex min-h-screen flex-col items-center bg-[#0D0512] px-6 py-10">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,#2A0F3D_0%,#0D0512_60%)]" />
+
+      <div className="relative z-10 w-full max-w-xl">
+        <div className="mb-8 flex items-center justify-between rounded-full border border-[#963BC4]/40 bg-[#160821]/80 px-6 py-3">
+          <span className="text-sm text-[#B79CC9]">
+            Pergunta {indiceAtual + 1} de {perguntas.length}
+          </span>
+          <span className="text-lg font-bold text-white">
+            {pontos} <span className="text-[#963BC4]">pts</span>
+          </span>
+        </div>
+
+        <h2 className="mb-6 text-center text-2xl font-bold text-white">
+          {perguntaAtual.texto}
+        </h2>
+
+        {acertou && pessoaCorreta && (
+          <div className="mb-6 flex flex-col items-center">
+            <img
+              src={pessoaCorreta.foto}
+              alt={pessoaCorreta.nome}
+              className="h-32 w-32 rounded-full border-4 border-[#963BC4] object-cover shadow-[0_0_30px_-5px_#963BC4]"
+            />
+            <p className="mt-2 font-semibold text-[#C084E8]">
+              Isso aí, era {pessoaCorreta.nome}!
+            </p>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {PESSOAS.map((pessoa) => (
+            <label
+              key={pessoa.id}
+              className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 transition
+                ${
+                  acertou && pessoa.id === perguntaAtual.respostaId
+                    ? "border-[#963BC4] bg-[#963BC4]/20"
+                    : "border-[#2A1533] bg-[#160821]/60 hover:border-[#963BC4]/50"
+                }`}
+            >
+              <input
+                type="checkbox"
+                checked={acertou && pessoa.id === perguntaAtual.respostaId}
+                disabled={acertou}
+                onChange={() => handleSelecionar(pessoa.id)}
+                className="h-5 w-5 accent-[#963BC4]"
+              />
+              <span className="text-white">{pessoa.nome}</span>
+            </label>
+          ))}
+        </div>
+
+        {erro && (
+          <p className="mt-4 text-center text-sm text-red-400">
+            Não é essa pessoa, tente outra vez!
+          </p>
+        )}
+
+        {acertou && (
+          <button
+            onClick={proximaPergunta}
+            className="mt-8 w-full rounded-full py-4 font-semibold text-white transition-transform hover:scale-105"
+            style={{
+              background: "linear-gradient(135deg, #963BC4 0%, #6B21A8 100%)",
+              boxShadow: "0 0 25px rgba(150, 59, 196, 0.5)",
+            }}
+          >
+            {indiceAtual + 1 < perguntas.length ? "Próxima pergunta" : "Ver resultado"}
+          </button>
+        )}
+      </div>
+    </main>
+  );
+}
+
+function TelaFinal({ titulo, mensagem, mostrarBotao, onTentarNovamente }) {
+  return (
+    <main className="relative flex min-h-screen flex-col items-center justify-center bg-[#0D0512] px-6 text-center">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,#2A0F3D_0%,#0D0512_65%)]" />
+      <div className="relative z-10 max-w-md">
+        <h1 className="mb-4 text-4xl font-extrabold text-white">{titulo}</h1>
+        <p className="mb-8 text-lg text-[#B79CC9]">{mensagem}</p>
+        {mostrarBotao && (
+          <button
+            onClick={onTentarNovamente}
+            className="rounded-full px-10 py-4 font-semibold text-white transition-transform hover:scale-105"
+            style={{
+              background: "linear-gradient(135deg, #963BC4 0%, #6B21A8 100%)",
+              boxShadow: "0 0 25px rgba(150, 59, 196, 0.5)",
+            }}
+          >
+            Tentar novamente
+          </button>
+        )}
+      </div>
+    </main>
+  );
+}
