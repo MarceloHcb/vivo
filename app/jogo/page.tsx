@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 
 type Pessoa = {
   id: number;
@@ -66,10 +66,11 @@ export default function Jogo() {
   const [acertou, setAcertou] = useState(false);
   const [erro, setErro] = useState(false);
   const [fase, setFase] = useState<Fase>("jogando");
+
   useEffect(() => {
     localStorage.setItem("pontosJogo", "0");
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- necessário: embaralhar só pode rodar no cliente, pra evitar hydration mismatch
-  setJogo({
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- necessário: embaralhar só pode rodar no cliente, pra evitar hydration mismatch
+    setJogo({
       perguntas: embaralhar(PERGUNTAS_BASE),
       pontos: 0,
     });
@@ -116,16 +117,27 @@ export default function Jogo() {
     localStorage.setItem("pontosJogo", "0");
   }
 
+  // Tela de VITÓRIA — com a logo1 fixa no topo
   if (fase === "venceu") {
     return (
       <TelaFinal
-        titulo="Parabéns! 🎉"
+        logoTopo="/logo1.png"
+        titulo={
+          <div className="flex items-center justify-center gap-2">
+            <img
+              src="/clic.png"
+              alt="Ícone"
+              className="h-11 w-11 rounded-full object-cover shadow-[0_0_30px_-5px_#963BC4]"
+            />
+          </div>
+        }
         mensagem="Você acertou todo mundo e ganhou 6 meses de Amazon Prime ligue para 10315!"
         mostrarBotao={false}
       />
     );
   }
 
+  // Tela de DERROTA — sem a logo do topo
   if (fase === "perdeu") {
     return (
       <TelaFinal
@@ -133,10 +145,12 @@ export default function Jogo() {
         mensagem="Infelizmente você não atingiu a pontuação máxima. Tente novamente!"
         mostrarBotao={true}
         onTentarNovamente={tentarNovamente}
+        textoBotao="Tentar novamente"
       />
     );
   }
 
+  // Tela do JOGO (perguntas)
   return (
     <main className="relative flex min-h-screen flex-col items-center bg-[#0D0512] px-6 py-10">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,#2A0F3D_0%,#0D0512_60%)]" />
@@ -215,18 +229,36 @@ export default function Jogo() {
 }
 
 type TelaFinalProps = {
-  titulo: string;
+  titulo: ReactNode; // aceita string OU JSX (imagens, ícones, etc.)
   mensagem: string;
   mostrarBotao: boolean;
   onTentarNovamente?: () => void;
+  textoBotao?: string;
+  logoTopo?: string; // caminho da imagem fixa no topo (opcional)
 };
 
-function TelaFinal({ titulo, mensagem, mostrarBotao, onTentarNovamente }: TelaFinalProps) {
+function TelaFinal({
+  titulo,
+  mensagem,
+  mostrarBotao,
+  onTentarNovamente,
+  textoBotao = "Tentar novamente",
+  logoTopo,
+}: TelaFinalProps) {
   return (
     <main className="relative flex min-h-screen flex-col items-center justify-center bg-[#0D0512] px-6 text-center">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,#2A0F3D_0%,#0D0512_65%)]" />
-      <div className="relative z-10 max-w-md">
-        <h1 className="mb-4 text-4xl font-extrabold text-white">{titulo}</h1>
+
+      {logoTopo && (
+        <img
+          src={logoTopo}
+          alt="Logo"
+          className="absolute top-8 left-1/2 h-32 w-32 -translate-x-1/2 object-contain"
+        />
+      )}
+
+      <div className="relative z-10 flex max-w-md flex-col items-center">
+        <div className="mb-4">{titulo}</div>
         <p className="mb-8 text-lg text-[#B79CC9]">{mensagem}</p>
         {mostrarBotao && (
           <button
@@ -237,7 +269,7 @@ function TelaFinal({ titulo, mensagem, mostrarBotao, onTentarNovamente }: TelaFi
               boxShadow: "0 0 25px rgba(150, 59, 196, 0.5)",
             }}
           >
-            Tentar novamente
+            {textoBotao}
           </button>
         )}
       </div>
