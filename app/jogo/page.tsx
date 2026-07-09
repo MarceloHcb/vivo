@@ -16,7 +16,6 @@ type Pergunta = {
 
 type Fase = "jogando" | "venceu" | "perdeu";
 
-// 👉 Troque os nomes e fotos das pessoas aqui
 const PESSOAS: Pessoa[] = [
   { id: 1, nome: "Josafifa", foto: "/pessoas/Josafifa.jpg" },
   { id: 2, nome: "Aline", foto: "/pessoas/Aline.jpg" },
@@ -28,16 +27,15 @@ const PESSOAS: Pessoa[] = [
   { id: 8, nome: "Marcella", foto: "/pessoas/Marcella.jpg" },
 ];
 
-// 👉 Troque os textos das perguntas aqui (cada uma aponta pro id da pessoa certa)
 const PERGUNTAS_BASE: Pergunta[] = [
   { id: 1, texto: "Olá, olá.. Bom dia, já tem internet boa ai na residência?", respostaId: 1 },
-  { id: 2, texto: "OLÁ BOM DIA!!! OLÁ BOM DIA!!! Bom dia minha querida", respostaId: 2 },
+  { id: 2, texto: "OLÁ BOM DIA!!! OLÁ BOM DIA!!! Tudo bom minha querida(o)", respostaId: 2 },
   { id: 3, texto: "Olá bom dia! primeiramente poderia me arrumar um copinho d'água?", respostaId: 3 },
   { id: 4, texto: "Oi Meninaaaa, vamos colocar uma internet boa ai na casa? olha que cachorrinha bonitinha, eu tenho uma Pinscher", respostaId: 4 },
   { id: 5, texto: "Bom dia tem interesse em conhecer nossos planos de internet e telefonia movel? sou cria do Dendê", respostaId: 5 },
   { id: 6, texto: "Olá minha amiga desculpe atrapalhar o seu dia, é a vivo que esta passando aqui na sua rua, foi liberada uma oferta...", respostaId: 6 },
   { id: 7, texto: "O de casa Bom dia! um instante Sra. vou ali comprar uma Halls e já volto, oi já voltei!", respostaId: 7 },
-  { id: 8, texto: "OLÁ OLÁ MINHA AMIGA... VAMO COLOCAR INTERNET LA NA SUA CASA", respostaId: 8 },
+  { id: 8, texto: "OLÁ OLÁ MINHA AMIGA... VAMO BOTAR INTERNET LA NA SUA CASA", respostaId: 8 },
 ];
 
 function embaralhar<T>(array: T[]): T[] {
