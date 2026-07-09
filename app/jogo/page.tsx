@@ -31,7 +31,7 @@ const PERGUNTAS_BASE: Pergunta[] = [
   { id: 1, texto: "Olá, olá.. Bom dia, já tem internet boa ai na residência?", respostaId: 1 },
   { id: 2, texto: "OLÁ BOM DIA!!! OLÁ BOM DIA!!! Tudo bom minha querida(o)", respostaId: 2 },
   { id: 3, texto: "Olá bom dia! primeiramente poderia me arrumar um copinho d'água?", respostaId: 3 },
-  { id: 4, texto: "Oi Meninaaaa, vamos colocar uma internet boa ai na casa? olha que cachorrinha bonitinha, eu tenho uma Pinscher", respostaId: 4 },
+  { id: 4, texto: "Eai Mininaaaa, vamos colocar uma internet boa ai na casa? olha que cachorrinha bonitinha, eu tenho uma Pinscher", respostaId: 4 },
   { id: 5, texto: "Bom dia tem interesse em conhecer nossos planos de internet e telefonia movel? sou cria do Dendê", respostaId: 5 },
   { id: 6, texto: "Olá minha amiga desculpe atrapalhar o seu dia, é a vivo que esta passando aqui na sua rua, foi liberada uma oferta...", respostaId: 6 },
   { id: 7, texto: "O de casa Bom dia! um instante Sra. vou ali comprar uma Halls e já volto, oi já voltei!", respostaId: 7 },
@@ -50,15 +50,13 @@ function embaralhar<T>(array: T[]): T[] {
 const PONTOS_POR_ACERTO = 10;
 const PONTUACAO_MAXIMA = PESSOAS.length * PONTOS_POR_ACERTO;
 
-// Estado do jogo agrupado num único objeto, pra nunca precisar
-// disparar dois setState juntos (evita a cascata dentro do useEffect)
 type EstadoJogo = {
   perguntas: Pergunta[];
   pontos: number;
 };
 
 const ESTADO_INICIAL: EstadoJogo = {
-  perguntas: PERGUNTAS_BASE, // ordem "crua", igual no server e no client
+  perguntas: PERGUNTAS_BASE,
   pontos: 0,
 };
 
@@ -68,10 +66,6 @@ export default function Jogo() {
   const [acertou, setAcertou] = useState(false);
   const [erro, setErro] = useState(false);
   const [fase, setFase] = useState<Fase>("jogando");
-
-  // Só embaralha e zera a pontuação DEPOIS de montar no navegador.
-  // Isso evita o hydration mismatch (server e client começam iguais)
-  // e dispara um único setJogo (evita o aviso de cascata).
   useEffect(() => {
     localStorage.setItem("pontosJogo", "0");
       // eslint-disable-next-line react-hooks/set-state-in-effect -- necessário: embaralhar só pode rodar no cliente, pra evitar hydration mismatch
